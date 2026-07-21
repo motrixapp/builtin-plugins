@@ -35,7 +35,7 @@ Tag 必须符合 `motrix.<name>@<semver>` 格式。格式不对时，`scripts/pa
 ## 签名密钥管理
 
 - Ed25519 **私钥**只能存放在 GitHub Actions 的 `MOTRIX_PLUGIN_SIGNING_KEY` secret 中。该 secret 归属 `plugin-signing` Environment，`release.yml` 中的每次发布也都绑定到这个 Environment。不要把私钥提交到仓库、长期保存在开发者电脑上或输出到日志中。
-- 能不能发布由 GitHub 上的两项设置决定：Environment 的审核人规则，以及针对 `motrix.*@*` 的 protected-tag ruleset。这两项都需要手动配置，工作流既不能代你启用，也不能确认它们是否生效。确认之前不要假定保护已经开启；当前状态以 `release.yml` 中的注释为准。在两项保护确认生效前，任何能推送 release tag 的人实际上都能发布带官方签名的插件。
+- 能不能发布由 GitHub 上的两项设置决定：针对 `motrix.*@*` 的 protected-tag ruleset（只有 repo admin 能创建、移动或删除 release tag），以及 Environment 的审核人规则（每次发布运行都要先经审核人批准才会执行）。这两项属于 GitHub 配置而非工作流代码；存疑时用 `gh ruleset list` 和 `gh api repos/<owner>/<repo>/environments` 复核，带日期的状态记录见 `release.yml` 中的注释。
 - 轮换密钥时，运行 `node scripts/keygen.mjs` 生成一对新密钥。只把新私钥保存到 GitHub secret，用新公钥替换 `keys/signing-key.pub.pem`，然后删除本地生成的私钥文件。
 - 对应的**公钥**提交在仓库的 `keys/signing-key.pub.pem` 中，验证插件包时以它为准；`motrix-turbo` 之后也会固定同一把公钥。插件拉取功能完成后，`motrix-turbo` 会在安装更新前验证每个 `.moext` 的签名。目前用于搭建流程的 `fetch-builtins.mjs` 只会根据 lockfile 检查文件的 SHA-256；客户端暂时还不会验证签名。
 

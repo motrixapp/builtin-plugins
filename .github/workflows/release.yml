@@ -8,11 +8,12 @@ jobs:
   release:
     runs-on: ubuntu-latest
     # The signing key lives ONLY in this Environment (MOTRIX_PLUGIN_SIGNING_KEY).
-    # The Environment's required-reviewer gate and the protected-tag ruleset for
-    # motrix.*@* are a MANUAL, external GitHub configuration step tracked in
-    # Task 11 — NOT yet active, and this workflow cannot enforce or verify them.
-    # Until those are independently confirmed active, a tag push to motrix.*@*
-    # DOES mint a signature; the Environment binding below is not itself a gate.
+    # Two external GitHub protections gate this job, both verified active on
+    # 2026-07-22: the protected-tag ruleset for motrix.*@* (only repo admins
+    # can create/move/delete release tags) and this Environment's
+    # required-reviewer rule (a reviewer must approve the run before any step
+    # executes). The workflow cannot enforce or verify either — re-check with
+    # `gh ruleset list` and `gh api repos/<owner>/<repo>/environments/plugin-signing`.
     environment: plugin-signing
     steps:
       - uses: actions/checkout@v4

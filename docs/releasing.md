@@ -45,13 +45,13 @@ Tags must match `motrix.<name>@<semver>` — anything else is rejected by
   `plugin-signing` Environment; `release.yml` binds every release run to
   that Environment. The key is never committed, never present on a developer
   machine long-term, and never logged.
-- Two protections govern who can mint a release: the Environment's
-  required-reviewer gate and the protected-tag ruleset for `motrix.*@*`.
-  Both are manual GitHub configuration steps that the workflow itself cannot
-  enforce or verify — do not assume they are active until independently
-  confirmed (the authoritative status note lives in the comments of
-  `release.yml`). Until they are confirmed active, tag-push rights are
-  effectively release rights.
+- Two protections govern who can mint a release: the protected-tag ruleset
+  for `motrix.*@*` (only repo admins can create, move, or delete release
+  tags) and the Environment's required-reviewer rule (a reviewer must
+  approve each release run before any step executes). Both live in GitHub
+  configuration, not in workflow code — when in doubt, re-verify with
+  `gh ruleset list` and `gh api repos/<owner>/<repo>/environments`; the
+  dated status note lives in the comments of `release.yml`.
 - Key rotation: run `scripts/keygen.mjs` to generate a fresh keypair, store
   the new private key material only in the GitHub secret, replace
   `keys/signing-key.pub.pem` with the new public key, and discard the local
