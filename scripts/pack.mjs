@@ -4,6 +4,13 @@
 // <id>-<version>.metadata.json { id, version, file, sha256, size }.
 // The staged tree layout matches PluginRegistry.scanInto():
 //   motrix-plugin.json, dist/plugin.js, locales/*.json?, icon.png?
+
+// Zip entries store LOCAL DOS time: without a pinned timezone the same tree
+// packs to different bytes on different machines, breaking the "rebuild the
+// tag, confirm the digest" audit property. Must be set before yazl converts
+// any entry mtime.
+process.env.TZ = 'UTC'
+
 import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { createWriteStream } from 'node:fs'
