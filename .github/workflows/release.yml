@@ -3,18 +3,14 @@ on:
   push:
     tags: ['motrix.*@*']
 permissions:
-  contents: write
+  contents: read
 jobs:
-  release:
+  # Split build/sign design: this job runs the attacker-influenceable tag tree
+  # (install lifecycle scripts, tests, esbuild) WITHOUT any secret or
+  # environment binding. It can be compromised by a malicious tag tree, but
+  # has nothing to steal and cannot publish anything.
+  build:
     runs-on: ubuntu-latest
-    # The signing key lives ONLY in this Environment (MOTRIX_PLUGIN_SIGNING_KEY).
-    # Two external GitHub protections gate this job, both verified active on
-    # 2026-07-22: the protected-tag ruleset for motrix.*@* (only repo admins
-    # can create/move/delete release tags) and this Environment's
-    # required-reviewer rule (a reviewer must approve the run before any step
-    # executes). The workflow cannot enforce or verify either — re-check with
-    # `gh ruleset list` and `gh api repos/<owner>/<repo>/environments/plugin-signing`.
-    environment: plugin-signing
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -32,19 +28,73 @@ jobs:
         run: |
           mv=$(node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync("plugins/${{ steps.tag.outputs.id }}/motrix-plugin.json","utf8")).version)')
           [ "$mv" = "${{ steps.tag.outputs.version }}" ] || { echo "manifest $mv != tag ${{ steps.tag.outputs.version }}"; exit 1; }
-      # Build, typecheck, and test the tag's tree before pack/sign. This is a
-      # functional correctness gate, not a security control: the tag tree is
-      # attacker-influenced, and running it in the same job that later touches
-      # the signing key is exactly what Task 11's build/sign job split addresses.
       - run: pnpm -r build
       - run: pnpm -r typecheck
       - run: pnpm test
       - name: Pack
         run: node scripts/pack.mjs "${{ steps.tag.outputs.id }}"
-      - name: Sign
+      - name: Upload unsigned artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: moext-unsigned
+          path: |
+            dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.moext
+            dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.metadata.json
+          if-no-files-found: error
+          retention-days: 1
+
+  # The ONLY job that can see the signing key (MOTRIX_PLUGIN_SIGNING_KEY,
+  # scoped to the plugin-signing Environment; its required-reviewer rule and
+  # the protected-tag ruleset for motrix.*@* were verified active on
+  # 2026-07-22 — re-check with `gh ruleset list` /
+  # `gh api repos/<owner>/<repo>/environments/plugin-signing`).
+  #
+  # It executes NO code from the tag tree: every script it runs comes from a
+  # pinned checkout of main, the tag commit must already be an ancestor of
+  # main (i.e. reviewed code), and it signs only the PRE-BUILT bytes handed
+  # over from the unprivileged build job.
+  sign:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: plugin-signing
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout trusted main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Assert tag commit is an ancestor of main
+        run: |
+          git fetch --force origin "+refs/tags/$GITHUB_REF_NAME:refs/tags/$GITHUB_REF_NAME"
+          tag_commit=$(git rev-parse "refs/tags/$GITHUB_REF_NAME^{commit}")
+          if ! git merge-base --is-ancestor "$tag_commit" refs/remotes/origin/main; then
+            echo "tag $GITHUB_REF_NAME ($tag_commit) is not an ancestor of main — refusing to sign"
+            exit 1
+          fi
+      - name: Parse tag (trusted scripts)
+        id: tag
+        run: |
+          json=$(node scripts/parse-tag.mjs "$GITHUB_REF_NAME")
+          echo "id=$(echo "$json" | node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(0,"utf8")).id)')" >> "$GITHUB_OUTPUT"
+          echo "version=$(echo "$json" | node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(0,"utf8")).version)')" >> "$GITHUB_OUTPUT"
+      - name: Download unsigned artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: moext-unsigned
+          path: dist/artifacts
+      - name: Sanity-check artifact size cap
+        run: |
+          f="dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.moext"
+          size=$(wc -c < "$f")
+          [ "$size" -le 5242880 ] || { echo "$f is ${size}B > 5 MiB cap"; exit 1; }
+      - name: Sign pre-built bytes
         env:
           MOTRIX_SIGNING_KEY_PEM: ${{ secrets.MOTRIX_PLUGIN_SIGNING_KEY }}
         run: node scripts/sign.mjs "dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.moext"
+      - name: Cross-check signature against committed public key
+        run: node scripts/verify.mjs "dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.moext" --pub keys/signing-key.pub.pem
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
