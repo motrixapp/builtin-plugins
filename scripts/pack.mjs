@@ -103,7 +103,9 @@ export async function packOne(id) {
   }
   const bundle = await stat(path.join(staged, 'dist', 'plugin.js'))
   if (bundle.size > BUNDLE_MAX) {
-    throw new Error(`${id}: dist/plugin.js ${bundle.size}B > ${BUNDLE_MAX}B cap`)
+    throw new Error(
+      `${id}: dist/plugin.js ${bundle.size}B > ${BUNDLE_MAX}B cap`
+    )
   }
   const file = `${manifest.id}-${manifest.version}.moext`
   const outFile = path.join(ARTIFACTS, file)

@@ -4,8 +4,8 @@
 // or --key <path>. Ed25519 passes `null` as the digest algorithm.
 import { createPrivateKey, createPublicKey, sign, verify } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
-import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 export function signBytes(bytes, privatePem) {
   return sign(null, bytes, createPrivateKey(privatePem)).toString('base64')
@@ -28,7 +28,7 @@ if (invokedDirectly) {
   const args = process.argv.slice(2)
   const keyFlag = args.indexOf('--key')
   const file = args.find(
-    (a, i) => keyFlag < 0 || (i !== keyFlag && i !== keyFlag + 1)
+    (_a, i) => keyFlag < 0 || (i !== keyFlag && i !== keyFlag + 1)
   )
   if (!file) {
     console.error('usage: sign.mjs <file> [--key <private.pem>]')

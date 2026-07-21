@@ -141,6 +141,7 @@ pnpm install               # 安装工作区依赖
 pnpm -r build              # 构建所有插件的 dist/plugin.js
 pnpm -r typecheck          # 对所有插件做类型检查，不生成文件
 pnpm test                  # 运行 Vitest 测试
+pnpm lint                  # 运行 Biome 检查（lint 与格式）
 node scripts/pack.mjs      # 把所有插件打包到 dist/artifacts/*.moext
 node scripts/pack.mjs <id> # 只打包一个插件，例如 motrix.url-resolver
 ```

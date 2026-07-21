@@ -173,6 +173,7 @@ pnpm install               # Install workspace dependencies
 pnpm -r build              # Build dist/plugin.js for all plugins
 pnpm -r typecheck          # Type-check all plugins without emitting files
 pnpm test                  # Run the Vitest suite
+pnpm lint                  # Check lint and formatting rules (Biome)
 node scripts/pack.mjs      # Package all plugins into dist/artifacts/*.moext
 node scripts/pack.mjs <id> # Package one plugin, such as motrix.url-resolver
 ```
