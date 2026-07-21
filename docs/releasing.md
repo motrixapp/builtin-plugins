@@ -27,13 +27,18 @@ releasing a new plugin version, bump the corresponding lockfile entry in
    git tag motrix.url-resolver@1.1.0
    git push origin motrix.url-resolver@1.1.0
    ```
-3. The tag push triggers `.github/workflows/release.yml`, which:
-   - asserts the manifest version matches the tag version,
-   - builds, typechecks, and tests the whole workspace,
-   - packs just that plugin into `.moext` + `.metadata.json`,
-   - signs the `.moext` (Ed25519 detached signature),
-   - publishes a GitHub Release with the `.moext`, `.moext.sig`, and
-     `.metadata.json` attached.
+3. The tag push triggers `.github/workflows/release.yml`, which runs two
+   jobs:
+   - **build** (no secret): asserts the manifest version matches the tag,
+     builds, typechecks, and tests the whole workspace, packs just that
+     plugin into `.moext` + `.metadata.json`, and hands them over as a
+     workflow artifact;
+   - **sign** (bound to the `plugin-signing` Environment — a reviewer must
+     approve the run): asserts the tag commit is an ancestor of `main`,
+     signs the pre-built `.moext` (Ed25519 detached signature) using only
+     scripts checked out from `main`, cross-checks the signature against
+     `keys/signing-key.pub.pem`, and publishes a GitHub Release with the
+     `.moext`, `.moext.sig`, and `.metadata.json` attached.
 
 Tags must match `motrix.<name>@<semver>` — anything else is rejected by
 `scripts/parse-tag.mjs` before packing starts.
@@ -58,10 +63,10 @@ Tags must match `motrix.<name>@<semver>` — anything else is rejected by
   private-key file.
 - The corresponding **public** key is committed at
   `keys/signing-key.pub.pem` — the canonical copy consumers verify against.
-  `motrix-turbo` will pin its own copy and verify every fetched `.moext`'s
-  signature before installing an update. Today, the seed pipeline
-  (`fetch-builtins.mjs`) only verifies each artifact's sha256 against the
-  lockfile — nothing on the client verifies signatures yet.
+  `motrix-turbo` pins its own copy at `scripts/builtins-signing.pub.pem`;
+  its `fetch-builtins.mjs` verifies every fetched `.moext`'s Ed25519
+  signature (in addition to the lockfile sha256) at every source before
+  installing.
 
 ## Verifying an artifact
 

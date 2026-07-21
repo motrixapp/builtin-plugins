@@ -22,13 +22,10 @@
    git push origin motrix.url-resolver@1.1.0
    ```
 
-3. 推送 tag 后会触发 `.github/workflows/release.yml`。工作流会：
+3. 推送 tag 后会触发 `.github/workflows/release.yml`，它分两个 job 执行：
 
-   - 检查插件清单中的版本是否与 tag 一致；
-   - 构建整个工作区，并完成类型检查和测试；
-   - 将对应插件打包为 `.moext`，同时生成 `.metadata.json`；
-   - 为 `.moext` 生成独立的 Ed25519 签名；
-   - 创建 GitHub Release，并附上 `.moext`、`.moext.sig` 和 `.metadata.json`。
+   - **build**（不接触密钥）：检查插件清单中的版本是否与 tag 一致，构建整个工作区并完成类型检查和测试，将对应插件打包为 `.moext` 和 `.metadata.json`，以 workflow artifact 形式移交；
+   - **sign**（绑定 `plugin-signing` Environment，需审核人批准后才会运行）：确认 tag 指向的提交已经合入 `main`，只使用 `main` 上的脚本为预构建的 `.moext` 生成独立的 Ed25519 签名，用 `keys/signing-key.pub.pem` 交叉核对签名，然后创建 GitHub Release，附上 `.moext`、`.moext.sig` 和 `.metadata.json`。
 
 Tag 必须符合 `motrix.<name>@<semver>` 格式。格式不对时，`scripts/parse-tag.mjs` 会直接报错，不会继续打包。
 
@@ -37,7 +34,7 @@ Tag 必须符合 `motrix.<name>@<semver>` 格式。格式不对时，`scripts/pa
 - Ed25519 **私钥**只能存放在 GitHub Actions 的 `MOTRIX_PLUGIN_SIGNING_KEY` secret 中。该 secret 归属 `plugin-signing` Environment，`release.yml` 中的每次发布也都绑定到这个 Environment。不要把私钥提交到仓库、长期保存在开发者电脑上或输出到日志中。
 - 能不能发布由 GitHub 上的两项设置决定：针对 `motrix.*@*` 的 protected-tag ruleset（只有 repo admin 能创建、移动或删除 release tag），以及 Environment 的审核人规则（每次发布运行都要先经审核人批准才会执行）。这两项属于 GitHub 配置而非工作流代码；存疑时用 `gh ruleset list` 和 `gh api repos/<owner>/<repo>/environments` 复核，带日期的状态记录见 `release.yml` 中的注释。
 - 轮换密钥时，运行 `node scripts/keygen.mjs` 生成一对新密钥。只把新私钥保存到 GitHub secret，用新公钥替换 `keys/signing-key.pub.pem`，然后删除本地生成的私钥文件。
-- 对应的**公钥**提交在仓库的 `keys/signing-key.pub.pem` 中，验证插件包时以它为准；`motrix-turbo` 之后也会固定同一把公钥。插件拉取功能完成后，`motrix-turbo` 会在安装更新前验证每个 `.moext` 的签名。目前用于搭建流程的 `fetch-builtins.mjs` 只会根据 lockfile 检查文件的 SHA-256；客户端暂时还不会验证签名。
+- 对应的**公钥**提交在仓库的 `keys/signing-key.pub.pem` 中，验证插件包时以它为准。`motrix-turbo` 在 `scripts/builtins-signing.pub.pem` 固定了同一把公钥，其 `fetch-builtins.mjs` 在安装前除了核对 lockfile 中的 SHA-256，还会在每个来源验证 `.moext` 的 Ed25519 签名。
 
 ## 验证插件包
 
