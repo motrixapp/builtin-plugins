@@ -13,6 +13,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
       - run: pnpm -r build
       - run: pnpm -r typecheck
       - run: pnpm test
