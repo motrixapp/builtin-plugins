@@ -161,7 +161,7 @@ node scripts/pack.mjs <id> # 只打包一个插件，例如 motrix.url-resolver
 可以使用 Motrix 的插件签名公钥验证下载好的插件包：
 
 ```bash
-node scripts/verify.mjs <id>-<version>.moext --pub <signing-public-key.pem>
+node scripts/verify.mjs <id>-<version>.moext --pub keys/signing-key.pub.pem
 ```
 
 完整的发布步骤、签名密钥管理规则和首次发布准备，请查看[内置插件发布指南](./docs/releasing.zh-CN.md)。

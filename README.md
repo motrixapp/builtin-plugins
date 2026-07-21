@@ -196,7 +196,7 @@ packages, and signs the plugin, then creates a GitHub Release containing:
 To check a downloaded package with the Motrix plugin-signing public key:
 
 ```bash
-node scripts/verify.mjs <id>-<version>.moext --pub <signing-public-key.pem>
+node scripts/verify.mjs <id>-<version>.moext --pub keys/signing-key.pub.pem
 ```
 
 For the full release checklist, signing-key rules, and first-time setup, see

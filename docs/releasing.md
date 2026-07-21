@@ -53,20 +53,22 @@ Tags must match `motrix.<name>@<semver>` — anything else is rejected by
   `release.yml`). Until they are confirmed active, tag-push rights are
   effectively release rights.
 - Key rotation: run `scripts/keygen.mjs` to generate a fresh keypair, store
-  the new private key material only in the GitHub secret, and discard the
-  local files.
-- The corresponding **public** key will be pinned inside `motrix-turbo`,
-  which will then verify every fetched `.moext`'s signature before
-  installing an update. Today, the seed pipeline (`fetch-builtins.mjs`) only
-  verifies each artifact's sha256 against the lockfile — nothing on the
-  client verifies signatures yet.
+  the new private key material only in the GitHub secret, replace
+  `keys/signing-key.pub.pem` with the new public key, and discard the local
+  private-key file.
+- The corresponding **public** key is committed at
+  `keys/signing-key.pub.pem` — the canonical copy consumers verify against.
+  `motrix-turbo` will pin its own copy and verify every fetched `.moext`'s
+  signature before installing an update. Today, the seed pipeline
+  (`fetch-builtins.mjs`) only verifies each artifact's sha256 against the
+  lockfile — nothing on the client verifies signatures yet.
 
 ## Verifying an artifact
 
 With a release's `.moext` and its `.moext.sig` in the same directory:
 
 ```bash
-node scripts/verify.mjs <id>-<version>.moext --pub <signing-public-key.pem>
+node scripts/verify.mjs <id>-<version>.moext --pub keys/signing-key.pub.pem
 ```
 
 ## Pre-publish bootstrap
