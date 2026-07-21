@@ -1,0 +1,9 @@
+packages:
+  - '.'
+  - 'plugins/*'
+
+allowBuilds:
+  esbuild: true
+
+minimumReleaseAgeExclude:
+  - '@motrix/plugin-api@2.0.0'

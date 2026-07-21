@@ -1,0 +1,19 @@
+{
+  "name": "motrix-builtin-plugins",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "vitest run",
+    "pack": "node scripts/pack.mjs"
+  },
+  "devDependencies": {
+    "@motrix/plugin-api": "^2.0.0",
+    "esbuild": "^0.24.2",
+    "vitest": "^3",
+    "yauzl": "^3",
+    "yazl": "^2"
+  }
+}

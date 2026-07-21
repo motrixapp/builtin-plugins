@@ -1,0 +1,9 @@
+{
+  "name": "Motrix URL 解析器",
+  "description": "Motrix 的 URL 解析框架。不内置任何站点特定抽取器，仅含一个 Wikimedia Commons 演示解析器；站点解析由单独安装的 site-resolver 插件提供。",
+  "cmd.resolve": "解析 URL",
+  "cmd.flushCache": "清空解析缓存",
+  "settings.title": "URL 解析器",
+  "settings.preferredQuality.title": "首选清晰度",
+  "settings.preferredQuality.desc": "site-resolver 插件解析 URL 时默认请求的媒体清晰度。"
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://motrix.app/schemas/plugin/v1.json",
+  "manifestVersion": 1,
+  "id": "motrix.scraper-hook",
+  "name": "%name%",
+  "version": "1.0.0",
+  "description": "%description%",
+  "categories": ["site-resolver"],
+  "engines": { "motrix": ">=2.0.0 <3.0.0" },
+  "main": "dist/plugin.js",
+  "requestedHeapMB": 48,
+  "permissions": ["http"],
+  "hostPermissions": ["*://*/*"],
+  "activationEvents": ["onTaskType:http"],
+  "contributes": {
+    "hooks": {
+      "beforeCreate": { "role": "pre-resolve" }
+    },
+    "configuration": {
+      "title": "%settings.title%",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": true,
+            "title": "%settings.enabled.title%",
+            "description": "%settings.enabled.desc%"
+          },
+          "maxBodyBytes": {
+            "type": "integer",
+            "default": 524288,
+            "minimum": 4096,
+            "maximum": 2097152,
+            "title": "%settings.maxBodyBytes.title%",
+            "description": "%settings.maxBodyBytes.desc%"
+          }
+        }
+      }
+    }
+  },
+  "l10n": "locales"
+}

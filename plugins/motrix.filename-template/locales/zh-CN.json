@@ -1,0 +1,8 @@
+{
+  "name": "Motrix 文件名模板",
+  "description": "在完成下载前按模板（{{title}}、{{ext}}、{{date}}、{{id}}）重命名文件。",
+  "cmd.applyTemplate": "应用文件名模板",
+  "settings.title": "文件名模板",
+  "settings.template.title": "文件名模板",
+  "settings.template.desc": "重命名文件所用的模板。可用占位符：{{title}}、{{ext}}、{{date}}、{{id}}。"
+}

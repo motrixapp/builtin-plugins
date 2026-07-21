@@ -1,0 +1,14 @@
+{
+  "name": "motrix-builtin-url-resolver",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@motrix/plugin-api": "^2.0.0",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.6.3"
+  }
+}

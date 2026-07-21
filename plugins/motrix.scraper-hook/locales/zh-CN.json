@@ -1,0 +1,9 @@
+{
+  "name": "Motrix 页面抓取",
+  "description": "识别 HTML 下载页面并改写到页面里指向的压缩包链接。",
+  "settings.title": "页面抓取",
+  "settings.enabled.title": "启用",
+  "settings.enabled.desc": "扫描下载页面，并将 URL 改写为其引用的压缩包链接。",
+  "settings.maxBodyBytes.title": "最大页面体积",
+  "settings.maxBodyBytes.desc": "扫描压缩包链接时下载的最大 HTML 页面体积（字节）。"
+}

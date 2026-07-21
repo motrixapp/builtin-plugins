@@ -1,0 +1,9 @@
+{
+  "name": "Motrix Page Scraper",
+  "description": "Detects HTML download pages and rewrites the URL to the archive link they reference.",
+  "settings.title": "Page Scraper",
+  "settings.enabled.title": "Enabled",
+  "settings.enabled.desc": "Scan download pages and rewrite the URL to the archive link they reference.",
+  "settings.maxBodyBytes.title": "Max page size",
+  "settings.maxBodyBytes.desc": "Largest HTML page (in bytes) to download while scanning for an archive link."
+}

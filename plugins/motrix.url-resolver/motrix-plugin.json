@@ -1,0 +1,96 @@
+{
+  "$schema": "https://motrix.app/schemas/plugin/v1.json",
+  "manifestVersion": 1,
+  "id": "motrix.url-resolver",
+  "name": "%name%",
+  "version": "1.0.0",
+  "description": "%description%",
+  "categories": ["site-resolver"],
+  "engines": { "motrix": ">=2.0.0 <3.0.0" },
+  "main": "dist/plugin.js",
+  "requestedHeapMB": 48,
+  "permissions": ["http"],
+  "hostPermissions": ["*://commons.wikimedia.org/*"],
+  "activationEvents": ["onTaskType:http", "onProtocol:https"],
+  "contributes": {
+    "commands": [
+      {
+        "id": "motrix.url-resolver.resolve",
+        "title": "%cmd.resolve%",
+        "public": true,
+        "argsSchema": {
+          "type": "object",
+          "properties": {
+            "url": { "type": "string" },
+            "quality": { "type": "string", "enum": ["1080p", "720p", "480p"] }
+          },
+          "required": ["url"],
+          "additionalProperties": false
+        },
+        "resultSchema": {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "enum": ["direct", "mux"] },
+            "directUrl": { "type": "string" },
+            "headers": {
+              "type": "object",
+              "additionalProperties": { "type": "string" }
+            },
+            "video": {
+              "type": "object",
+              "required": ["url"],
+              "additionalProperties": false,
+              "properties": {
+                "url": { "type": "string" },
+                "headers": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            },
+            "audio": {
+              "type": "object",
+              "required": ["url"],
+              "additionalProperties": false,
+              "properties": {
+                "url": { "type": "string" },
+                "headers": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            },
+            "container": { "enum": ["mp4", "mkv"] },
+            "title": { "type": "string" }
+          }
+        }
+      },
+      {
+        "id": "motrix.url-resolver.flushCache",
+        "title": "%cmd.flushCache%",
+        "public": false
+      }
+    ],
+    "hooks": {
+      "beforeCreate": { "role": "pre-resolve" }
+    },
+    "configuration": {
+      "title": "%settings.title%",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "preferredQuality": {
+            "type": "string",
+            "enum": ["1080p", "720p", "480p"],
+            "default": "720p",
+            "title": "%settings.preferredQuality.title%",
+            "description": "%settings.preferredQuality.desc%"
+          }
+        }
+      }
+    }
+  },
+  "l10n": "locales"
+}

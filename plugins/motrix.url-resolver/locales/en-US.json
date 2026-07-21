@@ -1,0 +1,9 @@
+{
+  "name": "Motrix URL Resolver",
+  "description": "URL-resolver framework for Motrix. Ships no site-specific extractors; includes only a Wikimedia Commons demo resolver. Site resolution is provided by separately installed site-resolver plugins.",
+  "cmd.resolve": "Resolve URL",
+  "cmd.flushCache": "Flush Resolver Cache",
+  "settings.title": "URL Resolver",
+  "settings.preferredQuality.title": "Preferred quality",
+  "settings.preferredQuality.desc": "Default media quality to request when a site-resolver plugin resolves a URL."
+}

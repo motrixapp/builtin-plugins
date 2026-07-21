@@ -1,0 +1,43 @@
+{
+  "$schema": "https://motrix.app/schemas/plugin/v1.json",
+  "manifestVersion": 1,
+  "id": "motrix.filename-template",
+  "name": "%name%",
+  "version": "1.0.0",
+  "description": "%description%",
+  "categories": ["post-action"],
+  "engines": { "motrix": ">=2.0.0 <3.0.0" },
+  "main": "dist/plugin.js",
+  "requestedHeapMB": 32,
+  "permissions": ["fs.task.write"],
+  "hostPermissions": ["*://*/*"],
+  "activationEvents": ["onTaskType:http", "onTaskType:ftp", "onTaskType:bt"],
+  "contributes": {
+    "commands": [
+      {
+        "id": "motrix.filename-template.applyTemplate",
+        "title": "%cmd.applyTemplate%",
+        "public": false
+      }
+    ],
+    "hooks": {
+      "beforeFinalize": { "role": "pre-resolve" }
+    },
+    "configuration": {
+      "title": "%settings.title%",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "template": {
+            "type": "string",
+            "default": "{{title}}.{{ext}}",
+            "maxLength": 128,
+            "title": "%settings.template.title%",
+            "description": "%settings.template.desc%"
+          }
+        }
+      }
+    }
+  },
+  "l10n": "locales"
+}

@@ -1,0 +1,67 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build and package output
+dist/
+*.moext
+*.moext.sig
+*.tgz
+
+# Test output
+coverage/
+.nyc_output/
+*.lcov
+
+# Tool caches
+*.tsbuildinfo
+.cache/
+.vite/
+.eslintcache
+.stylelintcache
+
+# Logs and Node.js diagnostic reports
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime files
+pids/
+*.pid
+*.pid.lock
+*.seed
+
+# Local environment files; commit templates instead
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Plugin signing private keys; public keys may be committed intentionally
+signing-key*.pem
+*.private.pem
+*.key.pem
+!*.pub.pem
+
+# Editors
+.idea/
+*.iml
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+*.swp
+*.swo
+*~
+
+# Operating system files
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,8 @@
+{
+  "name": "Motrix Filename Template",
+  "description": "Renames downloaded files using a template ({{title}}, {{ext}}, {{date}}, {{id}}) before they are finalized.",
+  "cmd.applyTemplate": "Apply Filename Template",
+  "settings.title": "Filename Template",
+  "settings.template.title": "Filename template",
+  "settings.template.desc": "Template for renamed files. Placeholders: {{title}}, {{ext}}, {{date}}, {{id}}."
+}
