@@ -1,0 +1,55 @@
+name: release
+on:
+  push:
+    tags: ['motrix.*@*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # The signing key lives ONLY in this Environment (MOTRIX_PLUGIN_SIGNING_KEY).
+    # The Environment's required-reviewer gate and the protected-tag ruleset for
+    # motrix.*@* are a MANUAL, external GitHub configuration step tracked in
+    # Task 11 — NOT yet active, and this workflow cannot enforce or verify them.
+    # Until those are independently confirmed active, a tag push to motrix.*@*
+    # DOES mint a signature; the Environment binding below is not itself a gate.
+    environment: plugin-signing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Parse tag
+        id: tag
+        run: |
+          json=$(node scripts/parse-tag.mjs "$GITHUB_REF_NAME")
+          echo "id=$(echo "$json" | node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(0,"utf8")).id)')" >> "$GITHUB_OUTPUT"
+          echo "version=$(echo "$json" | node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(0,"utf8")).version)')" >> "$GITHUB_OUTPUT"
+      - name: Assert manifest version matches tag
+        run: |
+          mv=$(node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync("plugins/${{ steps.tag.outputs.id }}/motrix-plugin.json","utf8")).version)')
+          [ "$mv" = "${{ steps.tag.outputs.version }}" ] || { echo "manifest $mv != tag ${{ steps.tag.outputs.version }}"; exit 1; }
+      # Build, typecheck, and test the tag's tree before pack/sign. This is a
+      # functional correctness gate, not a security control: the tag tree is
+      # attacker-influenced, and running it in the same job that later touches
+      # the signing key is exactly what Task 11's build/sign job split addresses.
+      - run: pnpm -r build
+      - run: pnpm -r typecheck
+      - run: pnpm test
+      - name: Pack
+        run: node scripts/pack.mjs "${{ steps.tag.outputs.id }}"
+      - name: Sign
+        env:
+          MOTRIX_SIGNING_KEY_PEM: ${{ secrets.MOTRIX_PLUGIN_SIGNING_KEY }}
+        run: node scripts/sign.mjs "dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.moext"
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.moext" \
+            "dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.moext.sig" \
+            "dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.metadata.json" \
+            --title "$GITHUB_REF_NAME" --notes "Signed .moext release for ${{ steps.tag.outputs.id }} ${{ steps.tag.outputs.version }}"
