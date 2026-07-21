@@ -8,9 +8,9 @@
 
 这个仓库按照 2026 年 7 月 18 日的“内置插件独立更新”设计，从 `motrix-turbo` 中拆分而来。拆分后，每个内置插件都可以使用自己的版本和 tag 发布，不必再等待整个应用发版。
 
-拉取流程切换完成后，`motrix-turbo` 会运行 `scripts/fetch-builtins.mjs`，按照 lockfile 中锁定的版本下载这里发布的已签名 `.moext` 文件。
+`motrix-turbo` 通过 `scripts/fetch-builtins.mjs` 下载这里发布的已签名 `.moext` 文件，各插件的 tag 和 sha256 锁定在其 `scripts/builtins.lock.json` 中。
 
-在 `motrix-turbo` 完成这项切换之前，`motrix-turbo/builtin-plugins/` 中的插件副本仍是应用打包时使用的版本。修改插件时需要同步两个仓库，避免内容不一致。
+本仓库是内置插件代码的唯一来源。发布新版本后，需要到 `motrix-turbo` 更新 lockfile 中对应插件的记录，应用才会使用新版本。
 
 ## 发布步骤
 
@@ -46,16 +46,3 @@ Tag 必须符合 `motrix.<name>@<semver>` 格式。格式不对时，`scripts/pa
 ```bash
 node scripts/verify.mjs <id>-<version>.moext --pub keys/signing-key.pub.pem
 ```
-
-## npm 发布前的临时配置
-
-在 `@motrix/plugin-api` 发布到 npm 之前，`pnpm-workspace.yaml` 中保留了下面这项临时 override：
-
-```yaml
-overrides:
-  '@motrix/plugin-api': 'file:../plugin-sdk/packages/plugin-api'
-```
-
-这项配置要求 `plugin-sdk` 位于当前仓库的同级目录，与拆分前 `motrix-app/` 工作区的目录结构一致。
-
-`@motrix/plugin-api` 发布后，应删除这项 override，并把三个插件 `devDependencies` 中的版本改为 npm 上已经发布的 `^x.y.z` 范围。

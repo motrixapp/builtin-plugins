@@ -11,13 +11,13 @@ README.
 This repo was extracted out of `motrix-turbo` (per the "Builtin Plugin
 Independent Update" design, 2026-07-18) so each builtin plugin can be
 versioned and released on its own tag instead of waiting for a full app
-release. Once the fetch cutover is complete, `motrix-turbo` will download the
-signed `.moext` files published here through its lockfile-pinned
-`scripts/fetch-builtins.mjs` step.
+release. `motrix-turbo` downloads the signed `.moext` files published here
+through its lockfile-pinned `scripts/fetch-builtins.mjs` step
+(`scripts/builtins.lock.json` pins each plugin's tag and sha256).
 
-Until that fetch cutover completes in `motrix-turbo`, the in-tree plugin
-copies under `motrix-turbo/builtin-plugins/` remain the packing
-source-of-truth — coordinate changes so the two trees don't drift.
+This repo is the sole source of truth for builtin plugin code. After
+releasing a new plugin version, bump the corresponding lockfile entry in
+`motrix-turbo` so the app picks it up.
 
 ## Release process
 
@@ -70,18 +70,3 @@ With a release's `.moext` and its `.moext.sig` in the same directory:
 ```bash
 node scripts/verify.mjs <id>-<version>.moext --pub keys/signing-key.pub.pem
 ```
-
-## Pre-publish bootstrap
-
-Until `@motrix/plugin-api` is published to npm, `pnpm-workspace.yaml` carries
-a bootstrap override:
-
-```yaml
-overrides:
-  '@motrix/plugin-api': 'file:../plugin-sdk/packages/plugin-api'
-```
-
-This assumes a sibling checkout of `plugin-sdk` (same layout as the
-`motrix-app/` workspace this repo was extracted from). Remove this override
-once `@motrix/plugin-api` is published and bump the three plugins'
-`devDependencies` to the published `^x.y.z` range instead.

@@ -7,12 +7,14 @@ maintained in one place.
 ## What this repo is
 
 `motrixapp/builtin-plugins` is a pnpm workspace monorepo holding the source
-and release pipeline for Motrix Turbo's three builtin plugins, being
-extracted out of `motrix-turbo` so they can be versioned and released
-independently of app releases (see `motrix-turbo/docs/superpowers/specs/2026-07-18-builtin-plugin-independent-update-design.md`).
-The in-tree copies under `motrix-turbo/builtin-plugins/` remain the packing
-source-of-truth until the Task 11 fetch cutover switches `motrix-turbo` over
-to fetching signed `.moext` releases this repo publishes and removes them.
+and release pipeline for Motrix Turbo's three builtin plugins, extracted out
+of `motrix-turbo` so they can be versioned and released independently of app
+releases (see `motrix-turbo/docs/superpowers/specs/2026-07-18-builtin-plugin-independent-update-design.md`).
+This repo is the SOLE source of truth for builtin plugin code: `motrix-turbo`
+consumes the signed `.moext` releases published here via its lockfile-pinned
+`scripts/fetch-builtins.mjs` (`scripts/builtins.lock.json` pins each plugin's
+tag + sha256); its former in-tree copies are deleted. After releasing a new
+plugin version, bump the corresponding lockfile entry in `motrix-turbo`.
 
 ## The three plugins
 
@@ -20,7 +22,7 @@ to fetching signed `.moext` releases this repo publishes and removes them.
 |----|----------------|---------|
 | `motrix.filename-template` | `plugins/motrix.filename-template/` | renames completed downloads from a user-configurable filename template |
 | `motrix.scraper-hook` | `plugins/motrix.scraper-hook/` | pre-resolve HTTP hook for site scraping |
-| `motrix.url-resolver` | `plugins/motrix.url-resolver/` | resolves YouTube/Bilibili page URLs to direct media URLs |
+| `motrix.url-resolver` | `plugins/motrix.url-resolver/` | URL-resolver framework + Wikimedia Commons demo resolver; site-specific extraction lives in separately installed site-resolver plugins |
 
 Plugin ids double as tag prefixes and manifest `id` fields — they must match
 the plugin's directory name (`scripts/pack.mjs` asserts this).
