@@ -104,3 +104,21 @@ jobs:
             "dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.moext.sig" \
             "dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.metadata.json" \
             --title "$GITHUB_REF_NAME" --notes "Signed .moext release for ${{ steps.tag.outputs.id }} ${{ steps.tag.outputs.version }}"
+      - name: Notify plugin-registry
+        # Opens a registry-entry-update PR on motrixapp/plugin-registry. The
+        # empty-token shell guard (not a step-level `if: secrets`, which is not
+        # reliably available) makes this a no-op until the token is provisioned,
+        # so the release still succeeds; the entry can be updated manually via
+        # the registry's workflow_dispatch in the meantime.
+        env:
+          GH_TOKEN: ${{ secrets.REGISTRY_DISPATCH_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "REGISTRY_DISPATCH_TOKEN not set — skipping registry notify"
+            exit 0
+          fi
+          gh api repos/motrixapp/plugin-registry/dispatches \
+            -f event_type=builtin-released \
+            -F client_payload[id]="${{ steps.tag.outputs.id }}" \
+            -F client_payload[version]="${{ steps.tag.outputs.version }}" \
+            -F client_payload[tag]="$GITHUB_REF_NAME"
