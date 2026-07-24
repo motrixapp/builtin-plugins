@@ -12,11 +12,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
         with: { version: 10 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: pnpm }
+      - uses: actions/setup-node@v7
+        with: { node-version: 24, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - name: Parse tag
         id: tag
@@ -34,7 +34,7 @@ jobs:
       - name: Pack
         run: node scripts/pack.mjs "${{ steps.tag.outputs.id }}"
       - name: Upload unsigned artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: moext-unsigned
           path: |
@@ -61,7 +61,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout trusted main
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: main
           fetch-depth: 0
@@ -80,7 +80,7 @@ jobs:
           echo "id=$(echo "$json" | node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(0,"utf8")).id)')" >> "$GITHUB_OUTPUT"
           echo "version=$(echo "$json" | node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(0,"utf8")).version)')" >> "$GITHUB_OUTPUT"
       - name: Download unsigned artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: moext-unsigned
           path: dist/artifacts
