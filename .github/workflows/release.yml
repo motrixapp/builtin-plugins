@@ -25,14 +25,19 @@ jobs:
           echo "id=$(echo "$json" | node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(0,"utf8")).id)')" >> "$GITHUB_OUTPUT"
           echo "version=$(echo "$json" | node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(0,"utf8")).version)')" >> "$GITHUB_OUTPUT"
       - name: Assert manifest version matches tag
+        env:
+          PLUGIN_ID: ${{ steps.tag.outputs.id }}
+          PLUGIN_VERSION: ${{ steps.tag.outputs.version }}
         run: |
-          mv=$(node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync("plugins/${{ steps.tag.outputs.id }}/motrix-plugin.json","utf8")).version)')
-          [ "$mv" = "${{ steps.tag.outputs.version }}" ] || { echo "manifest $mv != tag ${{ steps.tag.outputs.version }}"; exit 1; }
+          mv=$(node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync("plugins/"+process.env.PLUGIN_ID+"/motrix-plugin.json","utf8")).version)')
+          [ "$mv" = "$PLUGIN_VERSION" ] || { echo "manifest $mv != tag $PLUGIN_VERSION"; exit 1; }
       - run: pnpm -r build
       - run: pnpm -r typecheck
       - run: pnpm test
       - name: Pack
-        run: node scripts/pack.mjs "${{ steps.tag.outputs.id }}"
+        env:
+          PLUGIN_ID: ${{ steps.tag.outputs.id }}
+        run: node scripts/pack.mjs "$PLUGIN_ID"
       - name: Upload unsigned artifact
         uses: actions/upload-artifact@v7
         with:
@@ -85,25 +90,35 @@ jobs:
           name: moext-unsigned
           path: dist/artifacts
       - name: Sanity-check artifact size cap
+        env:
+          PLUGIN_ID: ${{ steps.tag.outputs.id }}
+          PLUGIN_VERSION: ${{ steps.tag.outputs.version }}
         run: |
-          f="dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.moext"
+          f="dist/artifacts/${PLUGIN_ID}-${PLUGIN_VERSION}.moext"
           size=$(wc -c < "$f")
           [ "$size" -le 5242880 ] || { echo "$f is ${size}B > 5 MiB cap"; exit 1; }
       - name: Sign pre-built bytes
         env:
           MOTRIX_SIGNING_KEY_PEM: ${{ secrets.MOTRIX_PLUGIN_SIGNING_KEY }}
-        run: node scripts/sign.mjs "dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.moext"
+          PLUGIN_ID: ${{ steps.tag.outputs.id }}
+          PLUGIN_VERSION: ${{ steps.tag.outputs.version }}
+        run: node scripts/sign.mjs "dist/artifacts/${PLUGIN_ID}-${PLUGIN_VERSION}.moext"
       - name: Cross-check signature against committed public key
-        run: node scripts/verify.mjs "dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.moext" --pub keys/signing-key.pub.pem
+        env:
+          PLUGIN_ID: ${{ steps.tag.outputs.id }}
+          PLUGIN_VERSION: ${{ steps.tag.outputs.version }}
+        run: node scripts/verify.mjs "dist/artifacts/${PLUGIN_ID}-${PLUGIN_VERSION}.moext" --pub keys/signing-key.pub.pem
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
+          PLUGIN_ID: ${{ steps.tag.outputs.id }}
+          PLUGIN_VERSION: ${{ steps.tag.outputs.version }}
         run: |
           gh release create "$GITHUB_REF_NAME" \
-            "dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.moext" \
-            "dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.moext.sig" \
-            "dist/artifacts/${{ steps.tag.outputs.id }}-${{ steps.tag.outputs.version }}.metadata.json" \
-            --title "$GITHUB_REF_NAME" --notes "Signed .moext release for ${{ steps.tag.outputs.id }} ${{ steps.tag.outputs.version }}"
+            "dist/artifacts/${PLUGIN_ID}-${PLUGIN_VERSION}.moext" \
+            "dist/artifacts/${PLUGIN_ID}-${PLUGIN_VERSION}.moext.sig" \
+            "dist/artifacts/${PLUGIN_ID}-${PLUGIN_VERSION}.metadata.json" \
+            --title "$GITHUB_REF_NAME" --notes "Signed .moext release for ${PLUGIN_ID} ${PLUGIN_VERSION}"
       - name: Notify plugin-registry
         # Opens a registry-entry-update PR on motrixapp/plugin-registry. The
         # empty-token shell guard (not a step-level `if: secrets`, which is not
@@ -112,6 +127,8 @@ jobs:
         # the registry's workflow_dispatch in the meantime.
         env:
           GH_TOKEN: ${{ secrets.REGISTRY_DISPATCH_TOKEN }}
+          PLUGIN_ID: ${{ steps.tag.outputs.id }}
+          PLUGIN_VERSION: ${{ steps.tag.outputs.version }}
         run: |
           if [ -z "$GH_TOKEN" ]; then
             echo "REGISTRY_DISPATCH_TOKEN not set — skipping registry notify"
@@ -119,6 +136,6 @@ jobs:
           fi
           gh api repos/motrixapp/plugin-registry/dispatches \
             -f event_type=builtin-released \
-            -F client_payload[id]="${{ steps.tag.outputs.id }}" \
-            -F client_payload[version]="${{ steps.tag.outputs.version }}" \
+            -F client_payload[id]="$PLUGIN_ID" \
+            -F client_payload[version]="$PLUGIN_VERSION" \
             -F client_payload[tag]="$GITHUB_REF_NAME"
