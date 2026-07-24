@@ -26,40 +26,70 @@ release them. Read on for a description of each plugin, or skip to
 
 *Plugin ID: `motrix.filename-template`*
 
-Uses a template to rename each download when it finishes. The name is changed
-before the file is placed in your download folder, so you only see the final
-name.
+Uses a safe, composable template to rename each download when it finishes.
+The name is changed before the file is placed in your download folder, so you
+only see the final name. Templates produce the filename stem; the original
+extension is preserved automatically.
 
 The template can contain these placeholders:
 
 | Placeholder | Value |
 |-------------|-------|
 | `{{title}}` | the original filename without its extension |
-| `{{ext}}` | the file extension |
-| `{{date}}` | the current date in `YYYY-MM-DD` format |
+| `{{original}}` | the complete original filename |
+| `{{ext}}` | the original extension without its leading dot |
+| `{{date}}` | the task request date in `YYYY-MM-DD` format |
+| `{{time}}` | the task request time in `HH-mm-ss` format |
 | `{{id}}` | the download task ID |
+| `{{host}}` | the source URL hostname |
+| `{{domain}}` | the hostname without a leading `www.` |
+| `{{urlPath}}` | the decoded source URL path |
+| `{{createdBy}}` | `user`, `protocol`, or `api` |
+| `{{meta.key}}` | a scalar value supplied through plugin metadata; nested keys work |
 
-For example, with the template `{{date}} {{title}}.{{ext}}`,
-`vacation-photos.zip` is saved as:
+`date` and `time` accept the format tokens `YYYY`, `MM`, `DD`, `HH`, `mm`,
+and `ss`. For example, with
+`{{date:YYYYMMDD}}-{{domain}}-{{title|slug}}`, `Vacation Photos.zip`
+downloaded from `www.example.com` is saved as:
 
 ```text
-2026-07-21 vacation-photos.zip
+20260721-example.com-vacation-photos.zip
 ```
 
-With the default template, `{{title}}.{{ext}}`, files keep their original
-names.
+Expressions can chain filters with `|`:
+
+| Filter | Effect |
+|--------|--------|
+| `trim` | removes surrounding whitespace |
+| `lower` / `upper` | changes letter case |
+| `slug` | produces a lowercase, hyphen-separated name |
+| `truncate:N` | keeps at most `N` Unicode characters |
+| `replace:"old":"new"` | replaces every occurrence of a string |
+| `default:"value"` | supplies a value when the input is empty |
+| `pad:N` | pads the value on the left with zeroes |
+
+For example, `{{meta.artist|default:"Unknown"|slug}}` safely uses metadata
+provided by another plugin. With the default template, `{{title}}`, files
+keep their original names because the extension is appended separately.
 
 **Settings**
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| Filename template | `{{title}}.{{ext}}` | The template used to name finished downloads |
+| Filename template | `{{title}}` | Template for the filename stem; the extension is preserved |
 
 **Notes**
 
 - Works with HTTP, FTP, and BitTorrent downloads.
-- Characters that cannot be used in filenames (`/ \ < > : " | ? *`) are
-  replaced with `_`. Names are also limited to 200 characters.
+- Common compound extensions such as `.tar.gz`, `.user.js`, and `.d.ts` are
+  kept intact.
+- Unsafe characters (`/ \ < > : " | ? *` and control characters) are
+  replaced with `_`. Windows reserved names and trailing spaces or dots are
+  normalized. Names are limited to 240 UTF-8 bytes without cutting the
+  extension.
+- Invalid variables or filters cancel the rename instead of risking a broken
+  filename. The internal `motrix.filename-template.preview` command returns
+  the output plus validation diagnostics for settings UIs.
 
 ## 🔗 Page Scraper
 

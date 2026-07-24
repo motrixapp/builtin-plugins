@@ -3,20 +3,19 @@
   "manifestVersion": 1,
   "id": "motrix.filename-template",
   "name": "%name%",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "%description%",
   "categories": ["post-action"],
   "engines": { "motrix": ">=2.0.0 <3.0.0" },
   "main": "dist/plugin.js",
   "requestedHeapMB": 32,
   "permissions": ["fs.task.write"],
-  "hostPermissions": ["*://*/*"],
   "activationEvents": ["onTaskType:http", "onTaskType:ftp", "onTaskType:bt"],
   "contributes": {
     "commands": [
       {
-        "id": "motrix.filename-template.applyTemplate",
-        "title": "%cmd.applyTemplate%",
+        "id": "motrix.filename-template.preview",
+        "title": "%cmd.preview%",
         "public": false
       }
     ],
@@ -30,8 +29,9 @@
         "properties": {
           "template": {
             "type": "string",
-            "default": "{{title}}.{{ext}}",
-            "maxLength": 128,
+            "default": "{{title}}",
+            "minLength": 1,
+            "maxLength": 512,
             "title": "%settings.template.title%",
             "description": "%settings.template.desc%"
           }

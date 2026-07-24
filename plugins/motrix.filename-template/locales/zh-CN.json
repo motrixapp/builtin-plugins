@@ -1,8 +1,8 @@
 {
   "name": "Motrix 文件名模板",
-  "description": "在完成下载前按模板（{{title}}、{{ext}}、{{date}}、{{id}}）重命名文件。",
-  "cmd.applyTemplate": "应用文件名模板",
+  "description": "在完成下载前按安全、可组合的模板重命名文件，并自动保留扩展名。",
+  "cmd.preview": "预览文件名模板",
   "settings.title": "文件名模板",
   "settings.template.title": "文件名模板",
-  "settings.template.desc": "重命名文件所用的模板。可用占位符：{{title}}、{{ext}}、{{date}}、{{id}}。"
+  "settings.template.desc": "文件名主体模板，原扩展名会自动保留。支持来源和元数据变量以及 trim、slug、lower、upper、truncate、replace、default、pad 过滤器。"
 }
