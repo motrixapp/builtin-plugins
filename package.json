@@ -2,6 +2,7 @@
   "name": "motrix-builtin-plugins",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@11.15.1",
   "engines": {
     "node": ">=20"
   },
