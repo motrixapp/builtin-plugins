@@ -1,0 +1,14 @@
+{
+  "manifestVersion": 1,
+  "id": "motrix.fixture-bad-version",
+  "name": "Fixture Bad Version",
+  "version": "not-a-semver",
+  "description": "Fixture: version does not match the manifest schema's semver grammar, so ManifestSchema.parse must reject it before the invariant check ever runs.",
+  "categories": ["site-resolver"],
+  "engines": { "motrix": ">=2.0.0 <3.0.0" },
+  "main": "dist/plugin.js",
+  "permissions": ["http"],
+  "hostPermissions": ["*://*/*"],
+  "activationEvents": ["onTaskType:http"],
+  "contributes": {}
+}

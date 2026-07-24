@@ -26,6 +26,7 @@ import {
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import yazl from 'yazl'
+import { validateManifest } from './validate-manifest.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const PLUGINS = path.join(ROOT, 'plugins')
@@ -108,6 +109,10 @@ export async function packOne(id) {
   if (manifest.id !== id) {
     throw new Error(`${id}: manifest.id "${manifest.id}" != directory name`)
   }
+  // Full manifest validation BEFORE any artifact bytes are written, so an
+  // invalid manifest (e.g. hooks without hostPermissions, which the host
+  // rejects at install) can never be packed, signed, or released.
+  validateManifest(manifest, id)
   const bundle = await stat(path.join(staged, 'dist', 'plugin.js'))
   if (bundle.size > BUNDLE_MAX) {
     throw new Error(

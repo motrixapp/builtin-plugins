@@ -7,3 +7,4 @@ allowBuilds:
 
 minimumReleaseAgeExclude:
   - '@motrix/plugin-api@2.0.0'
+  - '@motrix/plugin-manifest-schema@2.0.0'

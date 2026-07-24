@@ -1,0 +1,17 @@
+{
+  "manifestVersion": 1,
+  "id": "motrix.fixture-hook",
+  "name": "Fixture Hook Plugin",
+  "version": "1.0.0",
+  "description": "Fixture: declares a hook but no hostPermissions. Otherwise a fully valid manifest, so the only violation is the hooks => hostPermissions invariant.",
+  "categories": ["site-resolver"],
+  "engines": { "motrix": ">=2.0.0 <3.0.0" },
+  "main": "dist/plugin.js",
+  "permissions": ["http"],
+  "activationEvents": ["onTaskType:http"],
+  "contributes": {
+    "hooks": {
+      "beforeCreate": { "role": "pre-resolve" }
+    }
+  }
+}
