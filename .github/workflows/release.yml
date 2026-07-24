@@ -119,21 +119,43 @@ jobs:
             "dist/artifacts/${PLUGIN_ID}-${PLUGIN_VERSION}.moext.sig" \
             "dist/artifacts/${PLUGIN_ID}-${PLUGIN_VERSION}.metadata.json" \
             --title "$GITHUB_REF_NAME" --notes "Signed .moext release for ${PLUGIN_ID} ${PLUGIN_VERSION}"
-      - name: Notify plugin-registry
-        # Opens a registry-entry-update PR on motrixapp/plugin-registry. The
-        # empty-token shell guard (not a step-level `if: secrets`, which is not
-        # reliably available) makes this a no-op until the token is provisioned,
-        # so the release still succeeds; the entry can be updated manually via
-        # the registry's workflow_dispatch in the meantime.
+      - name: Check registry dispatch credentials
+        # The App-token mint hard-fails on missing credentials, so gate it on a
+        # plain step OUTPUT — the `secrets` context is not reliably available in
+        # a step-level `if:`, but step outputs are. When the App is not
+        # configured this skips the notify and the signed release still
+        # succeeds; the registry entry can then be updated manually via the
+        # registry's workflow_dispatch.
+        id: reg_creds
         env:
-          GH_TOKEN: ${{ secrets.REGISTRY_DISPATCH_TOKEN }}
+          APP_ID: ${{ secrets.REGISTRY_DISPATCH_APP_ID || vars.REGISTRY_DISPATCH_APP_ID }}
+          APP_KEY: ${{ secrets.REGISTRY_DISPATCH_APP_PRIVATE_KEY }}
+        run: |
+          if [ -n "$APP_ID" ] && [ -n "$APP_KEY" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "registry dispatch App not configured — skipping notify"
+          fi
+      - name: Mint registry dispatch token
+        id: registry_token
+        if: steps.reg_creds.outputs.present == 'true'
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.REGISTRY_DISPATCH_APP_ID || vars.REGISTRY_DISPATCH_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_DISPATCH_APP_PRIVATE_KEY }}
+          # Scope the short-lived (~1h) installation token to just the target repo.
+          owner: motrixapp
+          repositories: plugin-registry
+      - name: Notify plugin-registry
+        # Opens a registry-entry-update PR on motrixapp/plugin-registry using
+        # the short-lived App installation token minted above.
+        if: steps.reg_creds.outputs.present == 'true'
+        env:
+          GH_TOKEN: ${{ steps.registry_token.outputs.token }}
           PLUGIN_ID: ${{ steps.tag.outputs.id }}
           PLUGIN_VERSION: ${{ steps.tag.outputs.version }}
         run: |
-          if [ -z "$GH_TOKEN" ]; then
-            echo "REGISTRY_DISPATCH_TOKEN not set — skipping registry notify"
-            exit 0
-          fi
           gh api repos/motrixapp/plugin-registry/dispatches \
             -f event_type=builtin-released \
             -F client_payload[id]="$PLUGIN_ID" \
