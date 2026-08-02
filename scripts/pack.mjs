@@ -63,14 +63,24 @@ function runBuild(cwd) {
 }
 
 async function copyDirShallow(src, dst) {
+  // An absent directory is legal — locales/ is optional. Anything else (a
+  // permissions error, an unreadable entry) used to be swallowed by a bare
+  // `catch {}` around this whole body, which is how a plugin could pack with
+  // its locale catalogue silently missing and render `%name%` verbatim in the
+  // UI. Only ENOENT is tolerated now; validateLocaleCoverage in packOne is the
+  // second line of defence.
+  let entries
   try {
-    const entries = await readdir(src)
-    await mkdir(dst, { recursive: true })
-    for (const name of entries) {
-      const s = await stat(path.join(src, name))
-      if (s.isFile()) await copyFile(path.join(src, name), path.join(dst, name))
-    }
-  } catch {}
+    entries = await readdir(src)
+  } catch (err) {
+    if (err?.code === 'ENOENT') return
+    throw err
+  }
+  await mkdir(dst, { recursive: true })
+  for (const name of entries) {
+    const s = await stat(path.join(src, name))
+    if (s.isFile()) await copyFile(path.join(src, name), path.join(dst, name))
+  }
 }
 
 export async function stageOne(id) {
