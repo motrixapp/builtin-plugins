@@ -26,7 +26,10 @@ import {
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import yazl from 'yazl'
-import { validateManifest } from './validate-manifest.mjs'
+import {
+  validateLocaleCoverage,
+  validateManifest,
+} from './validate-manifest.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const PLUGINS = path.join(ROOT, 'plugins')
@@ -109,10 +112,16 @@ export async function packOne(id) {
   if (manifest.id !== id) {
     throw new Error(`${id}: manifest.id "${manifest.id}" != directory name`)
   }
-  // Full manifest validation BEFORE any artifact bytes are written, so an
-  // invalid manifest (e.g. hooks without hostPermissions, which the host
-  // rejects at install) can never be packed, signed, or released.
-  validateManifest(manifest, id)
+  // Full validation BEFORE any artifact bytes are written, so an invalid
+  // plugin (hooks without hostPermissions, which the host rejects at install;
+  // a placeholder with no translation, which renders as literal `%name%`) can
+  // never be packed, signed, or released.
+  //
+  // Both checks run against the STAGED tree rather than the source tree: that
+  // is the exact content going into the archive, so a locale file that failed
+  // to stage is caught here even though the source directory looks fine.
+  const parsed = validateManifest(manifest, id)
+  await validateLocaleCoverage(staged, parsed)
   const bundle = await stat(path.join(staged, 'dist', 'plugin.js'))
   if (bundle.size > BUNDLE_MAX) {
     throw new Error(
