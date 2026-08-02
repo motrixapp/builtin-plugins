@@ -15,8 +15,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0
       '@motrix/plugin-manifest-schema':
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: ^2.1.0
+        version: 2.1.0
       esbuild:
         specifier: ^0.24.2
         version: 0.24.2
@@ -437,8 +437,8 @@ packages:
   '@motrix/plugin-api@2.0.0':
     resolution: {integrity: sha512-S4YsMvAo9ehDN8R6jwQAzcTHBstEFH1kPw8CRePMVLSNT0pb+5jlaQdBXd1NfsxY9O4FFX4e63uuAYWlkD9Urw==}
 
-  '@motrix/plugin-manifest-schema@2.0.0':
-    resolution: {integrity: sha512-//RCfj9K5V3moqRUWsDzEEiC+6TSayJFCXPe2s9uj7PkdwC/Z3nvBN21SlxPfzvBI/VVr1kiRilhd28ldYfUHA==}
+  '@motrix/plugin-manifest-schema@2.1.0':
+    resolution: {integrity: sha512-S6p1uhoQzYbepVkYV86dmmD+7xLagto7ft3vWcLK4Fg8KtvEikV1b+ZPyE5OjgpZO3WEFcMe8uuc/Iymai0fmw==}
 
   '@rollup/rollup-android-arm-eabi@4.62.2':
     resolution: {integrity: sha512-6o7ZLZK+BeenkZCFNDXqpbjw9bD6nuWonvS/lwQJp7NoVVxm6p3qE7qQ5jGuBjiFsgvqjD8mZAU5oWxTmbOeOg==}
@@ -1050,7 +1050,7 @@ snapshots:
 
   '@motrix/plugin-api@2.0.0': {}
 
-  '@motrix/plugin-manifest-schema@2.0.0':
+  '@motrix/plugin-manifest-schema@2.1.0':
     dependencies:
       zod: 4.4.3
 
