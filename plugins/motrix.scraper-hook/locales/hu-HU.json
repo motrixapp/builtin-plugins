@@ -1,0 +1,9 @@
+{
+  "name": "Motrix oldalfigyelő",
+  "description": "Felismeri a HTML-letöltési oldalakat, és az URL-t az általuk hivatkozott archívum közvetlen hivatkozására cseréli.",
+  "settings.title": "Oldalfigyelő",
+  "settings.enabled.title": "Engedélyezve",
+  "settings.enabled.desc": "Átvizsgálja a letöltési oldalakat, és az URL-t az általuk hivatkozott archívum közvetlen hivatkozására cseréli.",
+  "settings.maxBodyBytes.title": "Maximális oldalméret",
+  "settings.maxBodyBytes.desc": "A legnagyobb HTML-oldal mérete bájtban, amelyet az archívumhivatkozás keresése közben letölt."
+}
