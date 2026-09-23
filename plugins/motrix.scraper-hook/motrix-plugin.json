@@ -3,7 +3,7 @@
   "manifestVersion": 1,
   "id": "motrix.scraper-hook",
   "name": "%name%",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "%description%",
   "categories": ["site-resolver"],
   "engines": { "motrix": ">=2.0.0 <3.0.0" },
@@ -14,7 +14,7 @@
   "activationEvents": ["onTaskType:http"],
   "contributes": {
     "hooks": {
-      "beforeCreate": { "role": "pre-resolve" }
+      "beforeCreate": { "role": "enrich" }
     },
     "configuration": {
       "title": "%settings.title%",

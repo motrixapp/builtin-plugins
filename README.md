@@ -95,6 +95,12 @@ keep their original names because the extension is appended separately.
 
 *Plugin ID: `motrix.scraper-hook`*
 
+> **Not bundled with Motrix.** Page Scraper used to ship as a built-in plugin.
+> It now installs on demand, because a page lookup is an optional convenience
+> and should never be able to hold up a download. Its `beforeCreate` hook runs
+> in the `enrich` band: if the lookup fails or runs long, Motrix drops the
+> plugin's contribution and downloads the URL you actually gave it.
+
 Sometimes a "download link" leads to an HTML page that contains the real file
 link. Without this plugin, Motrix would save the page as an `.html` file.
 

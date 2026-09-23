@@ -21,7 +21,7 @@ plugin version, bump the corresponding lockfile entry in `motrix-turbo`.
 | id | `plugins/` dir | purpose |
 |----|----------------|---------|
 | `motrix.filename-template` | `plugins/motrix.filename-template/` | renames completed downloads from a user-configurable filename template |
-| `motrix.scraper-hook` | `plugins/motrix.scraper-hook/` | pre-resolve HTTP hook for site scraping |
+| `motrix.scraper-hook` | `plugins/motrix.scraper-hook/` | enrich-band HTTP hook for page scraping; fails open, and is no longer in motrix-turbo's bundled set |
 | `motrix.url-resolver` | `plugins/motrix.url-resolver/` | URL-resolver framework + Wikimedia Commons demo resolver; site-specific extraction lives in separately installed site-resolver plugins |
 
 Plugin ids double as tag prefixes and manifest `id` fields — they must match
