@@ -1,0 +1,9 @@
+{
+  "name": "音视频合并",
+  "description": "手动将已下载或本地的视频和音频无损封装为 MP4 或 MKV。需要支持手动媒体合并界面的 Motrix 版本。",
+  "merge": "合并音频和视频",
+  "ffmpegMissing": "请在“设置 > 集成 > 媒体工具”中配置 FFmpeg，然后重新启用插件。",
+  "differentFiles": "请选择两个不同的文件。",
+  "outputFormat": "请选择 MP4 或 MKV 输出文件。",
+  "missingStreams": "所选文件需要分别提供视频轨和音频轨，请检查文件后重试。"
+}

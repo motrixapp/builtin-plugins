@@ -1,0 +1,9 @@
+{
+  "name": "Media Merge",
+  "description": "Manually combine a downloaded or local video and audio file into MP4 or MKV without re-encoding. Requires a Motrix build with the manual media merge interface.",
+  "merge": "Merge audio and video",
+  "ffmpegMissing": "Configure FFmpeg in Settings > Integration > Media Tools, then restart the plugin.",
+  "differentFiles": "Choose two different files.",
+  "outputFormat": "Choose an MP4 or MKV output file.",
+  "missingStreams": "The selected files must provide a video track and an audio track. Check the files and try again."
+}

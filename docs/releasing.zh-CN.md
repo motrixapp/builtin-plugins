@@ -10,7 +10,9 @@
 
 `motrix-turbo` 通过 `scripts/fetch-builtins.mjs` 下载这里发布的已签名 `.moext` 文件，各插件的 tag 和 sha256 锁定在其 `scripts/builtins.lock.json` 中。
 
-本仓库是内置插件代码的唯一来源。发布新版本后，需要到 `motrix-turbo` 更新 lockfile 中对应插件的记录，应用才会使用新版本。
+本仓库是官方插件代码的唯一来源。发布随应用安装的插件后，需要更新应用 lockfile 中对应插件的记录。`motrix.media-merge` 等可选插件不得加入 `scripts/builtins.lock.json`；使用相同签名工作流发布，并将已验证的安装包上架到 `plugin-registry`。
+
+发布音视频合并插件前，先确认最低宿主版本已包含 [Motrix #2308](https://github.com/agalwood/Motrix/pull/2308)。当前计划最低版本为 `2.0.0-beta.47`；若宿主能力推迟发布，应同步调整 manifest 和目录条目。未签名的本地构建不能作为目录安装包，URL、SHA-256、大小和签名必须通过 `entry:from-release` 从经过验证的正式产物生成。
 
 ## 发布步骤
 

@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { readdirSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import yauzl from 'yauzl'
@@ -29,10 +29,15 @@ describe('pack.mjs', () => {
     execFileSync('node', [path.join(ROOT, 'scripts', 'pack.mjs')], {
       stdio: 'inherit',
     })
-    const metas = readdirSync(ARTIFACTS).filter((f) =>
-      f.endsWith('.metadata.json')
-    )
-    expect(metas.length).toBe(3)
+    const { listPluginIds } = await import('../scripts/pack.mjs')
+    const metas = (await listPluginIds()).map((id) => {
+      const manifest = JSON.parse(
+        readFileSync(path.join(ROOT, 'plugins', id, 'motrix-plugin.json'))
+      )
+      return `${id}-${manifest.version}.metadata.json`
+    })
+    expect(metas.length).toBe(4)
+    expect(metas).toContain('motrix.media-merge-0.1.0.metadata.json')
     for (const metaFile of metas) {
       const meta = JSON.parse(readFileSync(path.join(ARTIFACTS, metaFile)))
       const moext = path.join(ARTIFACTS, meta.file)
@@ -47,8 +52,8 @@ describe('pack.mjs', () => {
 
   it('is deterministic: two packs of the same tree hash identically', async () => {
     const { packOne } = await import('../scripts/pack.mjs')
-    const a = await packOne('motrix.scraper-hook')
-    const b = await packOne('motrix.scraper-hook')
+    const a = await packOne('motrix.media-merge')
+    const b = await packOne('motrix.media-merge')
     expect(a.sha256).toBe(b.sha256)
     expect(a.size).toBe(b.size)
   }, 120_000)

@@ -16,8 +16,17 @@ through its lockfile-pinned `scripts/fetch-builtins.mjs` step
 (`scripts/builtins.lock.json` pins each plugin's tag and sha256).
 
 This repo is the sole source of truth for builtin plugin code. After
-releasing a new plugin version, bump the corresponding lockfile entry in
-`motrix-turbo` so the app picks it up.
+releasing a bundled plugin version, bump the corresponding lockfile entry in
+the app so it picks it up. Optional plugins, including `motrix.media-merge`,
+must remain out of `scripts/builtins.lock.json`. Release them through the same
+signing workflow and publish their verified package in `plugin-registry`.
+
+For Media Merge, first confirm the released minimum host version contains
+[Motrix #2308](https://github.com/agalwood/Motrix/pull/2308). Its initial minimum
+is planned as `2.0.0-beta.47`; adjust the manifest and directory entry together
+if the host feature ships later. The unsigned local build is not a registry
+install package: the entry's URL, SHA-256, size, and signature must come from
+the verified release via `entry:from-release`.
 
 ## Release process
 

@@ -7,22 +7,25 @@ maintained in one place.
 ## What this repo is
 
 `motrixapp/builtin-plugins` is a pnpm workspace monorepo holding the source
-and release pipeline for Motrix Turbo's three builtin plugins, extracted out
+and release pipeline for Motrix's official plugins, both bundled and optional, extracted out
 of `motrix-turbo` so they can be versioned and released independently of app
 releases (see `motrix-turbo/docs/superpowers/specs/2026-07-18-builtin-plugin-independent-update-design.md`).
 This repo is the SOLE source of truth for builtin plugin code: `motrix-turbo`
 consumes the signed `.moext` releases published here via its lockfile-pinned
 `scripts/fetch-builtins.mjs` (`scripts/builtins.lock.json` pins each plugin's
 tag + sha256); its former in-tree copies are deleted. After releasing a new
-plugin version, bump the corresponding lockfile entry in `motrix-turbo`.
+bundled plugin version, bump the corresponding app lockfile entry. Optional
+plugins must not be added to the app's default bundle; publish their signed
+packages through `plugin-registry` instead.
 
-## The three plugins
+## The plugins
 
 | id | `plugins/` dir | purpose |
 |----|----------------|---------|
 | `motrix.filename-template` | `plugins/motrix.filename-template/` | renames completed downloads from a user-configurable filename template |
 | `motrix.scraper-hook` | `plugins/motrix.scraper-hook/` | enrich-band HTTP hook for page scraping; fails open, and is no longer in motrix-turbo's bundled set |
 | `motrix.url-resolver` | `plugins/motrix.url-resolver/` | URL-resolver framework + Wikimedia Commons demo resolver; site-specific extraction lives in separately installed site-resolver plugins |
+| `motrix.media-merge` | `plugins/motrix.media-merge/` | manual audio/video merging with FFmpeg; optional, never added to the default app bundle |
 
 Plugin ids double as tag prefixes and manifest `id` fields — they must match
 the plugin's directory name (`scripts/pack.mjs` asserts this).
@@ -30,7 +33,7 @@ the plugin's directory name (`scripts/pack.mjs` asserts this).
 ## Hard constraints
 
 - **Minify: `minifyWhitespace` + `minifySyntax` only — never full `minify`.**
-  All three plugins build through the shared `buildPlugin()` in
+  All plugins build through the shared `buildPlugin()` in
   `shared/esbuild.base.mjs`. Do not add `minify: true` or change identifier
   names as part of the build step.
 

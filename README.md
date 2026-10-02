@@ -2,12 +2,13 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-**Official plugins that come with [Motrix](https://motrix.app).**
+**Official plugins for [Motrix](https://motrix.app), bundled or installed on demand.**
 
 ---
 
-Motrix 2 includes three plugins. They rename finished downloads, find files
-linked from download pages, and handle supported media page URLs. You can
+This repository maintains four plugins. Motrix bundles Filename Template and
+URL Resolver; Page Scraper and Media Merge are installed separately. They rename
+downloads, resolve page links, and combine separate audio and video files. You can
 change their settings or turn them off from the **Plugins** page in Motrix.
 
 This repository contains their source code and the scripts used to build and
@@ -21,6 +22,7 @@ release them. Read on for a description of each plugin, or skip to
 | 📝 [Filename Template](#-filename-template) | Gives finished downloads consistent names |
 | 🔗 [Page Scraper](#-page-scraper) | Finds the file linked from a download page |
 | 🎬 [URL Resolver](#-url-resolver) | Turns supported media page URLs into downloadable file URLs |
+| 🎞️ [Media Merge](#media-merge) | Manually combines video and audio into MP4 or MKV; installed separately |
 
 ## 📝 Filename Template
 
@@ -153,9 +155,24 @@ installed resolvers supports a URL, Motrix leaves it unchanged.
 |---------|---------|-------------|
 | Preferred quality | `720p` | The quality (`1080p`, `720p`, or `480p`) requested from a site resolver |
 
+## Media Merge
+
+*Plugin ID: `motrix.media-merge`*
+
+An optional official plugin that combines a video and an audio file without
+re-encoding. Choose MP4 or MKV, keep the originals, follow progress, or cancel.
+Open its **Operations** tab, or select two completed single-file downloads.
+Configure FFmpeg in **Settings → Integration → Media Tools** first.
+
+It is **not bundled with Motrix**. The first release requires a host containing
+the manual merge interface, currently planned for `2.0.0-beta.47` or later.
+Read the [plugin guide](plugins/motrix.media-merge/README.md) for compatibility,
+Server file selection, logs, and release prerequisites.
+
 ## Using the plugins in Motrix
 
-All three plugins are already installed and turned on.
+Filename Template and URL Resolver are installed and enabled with Motrix.
+Install optional plugins separately from the plugin directory or a `.moext` file.
 
 1. **Find a plugin:** click **Plugins** in the left sidebar.
 2. **Enable or disable it:** use the **Enabled** switch on its card or detail
@@ -166,8 +183,9 @@ All three plugins are already installed and turned on.
    renames, URL changes, and resolver matches.
 
 Motrix automatically gives builtin plugins the permissions they need. The
-read-only **Access** tab shows those permissions. Builtin plugins can be
-turned off, but they cannot be uninstalled.
+read-only **Access** tab shows those permissions. Bundled plugins can be
+turned off, but they cannot be uninstalled. Separately installed plugins use the
+normal installation and removal flow; being maintained here does not bundle them.
 
 ---
 
@@ -175,7 +193,7 @@ turned off, but they cannot be uninstalled.
 
 The rest of this document is for people working on the plugins.
 
-These plugins are bundled with Motrix, but they do not have to wait for a new
+The plugins released here do not have to wait for a new
 Motrix release. Each plugin has its own version and tag. Push that tag, and
 GitHub Actions builds, tests, packages, signs, and publishes the plugin.
 Motrix can then update it separately from the app.
@@ -187,7 +205,8 @@ Motrix can then update it separately from the app.
 | `plugins/motrix.filename-template/` | Renames finished downloads from a user-defined template |
 | `plugins/motrix.scraper-hook/` | Checks HTML download pages for direct file links before Motrix resolves the task |
 | `plugins/motrix.url-resolver/` | Shared URL resolver with a Wikimedia Commons example |
-| `shared/esbuild.base.mjs` | Shared `buildPlugin()` configuration used by all three plugin builds |
+| `plugins/motrix.media-merge/` | Optional manual audio/video merge command using FFmpeg |
+| `shared/esbuild.base.mjs` | Shared `buildPlugin()` configuration used by every plugin build |
 | `scripts/pack.mjs` | Builds a plugin, then writes `dist/artifacts/<id>-<version>.moext` and `<id>-<version>.metadata.json` (`id`, `version`, `file`, `sha256`, and `size`) |
 | `scripts/keygen.mjs` | Generates the Ed25519 key pair used during initial signing setup or key rotation |
 | `scripts/sign.mjs` | Creates a detached, base64-encoded Ed25519 signature (`<file>.sig`) for a `.moext` file |
