@@ -30,6 +30,12 @@ are not uploaded.
 This plugin does not concatenate clips, adjust sync offsets, transcode unsupported
 codecs or run automatically after downloads. If MP4 rejects a codec, try MKV.
 
+Inputs must be standalone media files (MP4/MOV, MKV/WebM, AVI, MPEG/TS, FLV,
+AAC, MP3, FLAC, Ogg or WAV). Playlists, concat scripts and image sequences are
+rejected before probing or merging, including references to local files.
+The host requires absolute paths and applies directory policy after resolving
+symlinks; relative references inside another file never inherit its authorization.
+
 ## Development
 
 Run these commands from the repository root. This plugin uses the shared build, packaging, and signing pipeline. Do not add it to Motrix’s `scripts/builtins.lock.json`.
@@ -48,3 +54,8 @@ contract `motrix.media-merge.mergeStreams` with `{ videoInput, audioInput,
 output }` and returns `{ outputPath }` after the operation succeeds. Both the
 launch call and its `result` are awaited for compatibility with the asynchronous
 QuickJS handle transport.
+
+This command is reserved for the host's manual merge interface. Its public
+declaration enables provider discovery, not cross-plugin execution. The host
+rejects generic and cross-plugin calls before the handler runs; do not invoke
+it with `commands.execute` or bypass the host's selected-file context.

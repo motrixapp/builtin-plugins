@@ -24,6 +24,11 @@
 本插件不做片段首尾拼接、音画偏移调整或不兼容编码的转码，也不在下载后自动执行。
 若 MP4 不支持当前编码，可尝试 MKV。
 
+输入必须是独立的媒体文件（MP4/MOV、MKV/WebM、AVI、MPEG/TS、FLV、AAC、MP3、
+FLAC、Ogg 或 WAV）。播放列表、concat 脚本和图片序列会在探测或合并前被拒绝，
+即使它们引用的也是本地文件。宿主要求绝对路径，并在解析符号链接后检查目录权限；
+文件内部的相对引用不会继承该文件的授权。
+
 ## 开发
 
 在仓库根目录执行以下命令。插件使用仓库统一的构建、打包和签名发布流程；不要将它加入 Motrix 的 `scripts/builtins.lock.json`。
@@ -40,3 +45,7 @@ node scripts/pack.mjs motrix.media-merge
 公开命令机制暴露 `motrix.media-merge.mergeStreams`，接收 `{ videoInput,
 audioInput, output }`，操作成功后返回 `{ outputPath }`。启动调用和操作句柄的
 `result` 都会被等待，以兼容 QuickJS 异步句柄传输。
+
+该命令保留给宿主的手动合并界面。公开声明用于发现提供此功能的插件，不允许跨插件执行。
+宿主会在处理函数运行前拒绝通用调用和跨插件调用；不要通过 `commands.execute` 调用它，
+也不要绕过宿主授权的文件选择上下文。
