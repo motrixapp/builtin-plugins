@@ -1,0 +1,54 @@
+{
+  "$schema": "https://motrix.app/schemas/plugin/v1.json",
+  "manifestVersion": 1,
+  "id": "motrix.media-merge",
+  "name": "%name%",
+  "version": "0.1.0",
+  "description": "%description%",
+  "categories": ["post-action"],
+  "engines": {
+    "motrix": ">=2.0.0-beta.47 <3.0.0"
+  },
+  "main": "dist/plugin.js",
+  "permissions": ["ffmpeg"],
+  "activationEvents": ["onCommand:motrix.media-merge.mergeStreams"],
+  "contributes": {
+    "commands": [
+      {
+        "id": "motrix.media-merge.mergeStreams",
+        "title": "%merge%",
+        "public": true,
+        "argsSchema": {
+          "type": "object",
+          "properties": {
+            "videoInput": {
+              "type": "string",
+              "minLength": 1
+            },
+            "audioInput": {
+              "type": "string",
+              "minLength": 1
+            },
+            "output": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": ["videoInput", "audioInput", "output"],
+          "additionalProperties": false
+        },
+        "resultSchema": {
+          "type": "object",
+          "properties": {
+            "outputPath": {
+              "type": "string"
+            }
+          },
+          "required": ["outputPath"],
+          "additionalProperties": false
+        }
+      }
+    ]
+  },
+  "l10n": "locales"
+}
