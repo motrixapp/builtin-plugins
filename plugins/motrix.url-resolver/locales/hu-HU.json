@@ -1,0 +1,9 @@
+{
+  "name": "Motrix URL-feloldó",
+  "description": "URL-feloldó keretrendszer a Motrixhoz. Nem tartalmaz webhelyspecifikus kinyerőket; csak egy Wikimedia Commons bemutató feloldót tartalmaz. A webhelyek feloldását külön telepített webhelyfeloldó bővítmények biztosítják.",
+  "cmd.resolve": "URL feloldása",
+  "cmd.flushCache": "Feloldási gyorsítótár ürítése",
+  "settings.title": "URL-feloldó",
+  "settings.preferredQuality.title": "Előnyben részesített minőség",
+  "settings.preferredQuality.desc": "Az alapértelmezett médiaminőség, amelyet a rendszer akkor kér, amikor egy webhelyfeloldó bővítmény felold egy URL-t."
+}

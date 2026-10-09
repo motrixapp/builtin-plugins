@@ -1,0 +1,8 @@
+{
+  "name": "Motrix fájlnévsablon",
+  "description": "Biztonságos, egymással kombinálható sablonokkal nevezi át a letöltéseket, az eredeti fájlkiterjesztés megőrzésével.",
+  "cmd.preview": "Fájlnévsablon előnézete",
+  "settings.title": "Fájlnévsablon",
+  "settings.template.title": "Fájlnévsablon",
+  "settings.template.desc": "Sablon a fájlnév kiterjesztés nélküli részéhez; az eredeti kiterjesztés automatikusan megmarad. Támogatja a forrás- és metaadat-változókat, valamint a trim (szóközök levágása), slug (URL-barát alak), lower (kisbetű), upper (nagybetű), truncate (csonkítás), replace (csere), default (alapérték), pad (kitöltés) szűrőket."
+}
