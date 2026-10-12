@@ -6,5 +6,5 @@ allowBuilds:
   esbuild: true
 
 minimumReleaseAgeExclude:
-  - '@motrix/plugin-api@2.0.0'
-  - '@motrix/plugin-manifest-schema@2.1.0'
+  - '@motrix/plugin-api@2.0.0 || 2.2.0'
+  - '@motrix/plugin-manifest-schema@2.2.0'

@@ -9,21 +9,24 @@ inputs. Unambiguously reversed inputs are detected and swapped automatically.
 
 ## Requirements
 
-- Motrix `>=2.0.0-beta.47 <3.0.0` with the **manual media merge interface**. The host change is [Motrix PR #2308](https://github.com/agalwood/Motrix/pull/2308); confirm the minimum release contains it before publishing the plugin. The `.moext` alone does not add the interface to an older build.
+- **Motrix 2.0.0-beta.48 or later, below 3.0.0**, with plugin operations v1, composable UI, selected-file grants and the scoped media capability. Beta.48 is the planned first supporting release; this mechanism and plugin remain unpublished. If the host feature ships later, raise the package and registry minimum together before signing. Beta.47 is rejected, including development builds still reporting that version.
 - FFmpeg configured in **Settings → Integration → Media Tools**. Re-enable the
   plugin after changing FFmpeg configuration.
 
 ## Use
 
-After the signed release is published, install it from the [plugin directory](https://motrix.app/plugins/motrix.media-merge/) and enable it. For local builds, select `dist/artifacts/motrix.media-merge-0.1.0.moext` on the Plugins page.
+After the signed release is published, install it from the [plugin directory](https://motrix.app/plugins/motrix.media-merge/) and enable it. Local archives using the `motrix.*` namespace also require a valid official signature before installation.
 Then either select two completed single-file downloads and choose **Merge audio
 and video**, or open this plugin's **Operations** tab to select local files.
 The tab embeds the same form as the task-menu dialog and retains selections
 when switching tabs. Select a new `.mp4` or `.mkv` output filename and click **Merge**.
 
+**Merge another file** clears both inputs, the output location and the previous result,
+while retaining the selected MP4/MKV format. Choose the new files explicitly; the
+previous task selection is not filled in again.
+
 The host owns progress, cancellation, temporary files and non-overwriting output
-publication. Original files remain untouched. The destination filesystem must
-support hard links. The Web UI reuses the server file browser to select inputs and a new output
+publication. Original files remain untouched. The host snapshots selected inputs and publishes the output atomically without replacement. The destination filesystem must support private directories and native no-replace publication; unsupported filesystems are rejected. The Web UI reuses the server file browser to select inputs and a new output
 filename, within its download directory policy. Files on the browser’s computer
 are not uploaded.
 
@@ -48,14 +51,20 @@ pnpm lint
 node scripts/pack.mjs motrix.media-merge
 ```
 
-The only requested permission is `ffmpeg`. The plugin has no network permission
-and registers no task lifecycle hooks. It exposes the existing public-command
-contract `motrix.media-merge.mergeStreams` with `{ videoInput, audioInput,
-output }` and returns `{ outputPath }` after the operation succeeds. Both the
-launch call and its `result` are awaited for compatibility with the asynchronous
-QuickJS handle transport.
+The plugin declares `contributes.operations` with a private command registered using
+`commands.registerOperation`. It requests `ffmpeg`, `files.selected.read` and
+`files.selected.write`. These declarations do not grant arbitrary file access:
+the host binds opaque selected-file references to one authorized operation.
+There is no network permission or download lifecycle hook.
 
-This command is reserved for the host's manual merge interface. Its public
-declaration enables provider discovery, not cross-plugin execution. The host
-rejects generic and cross-plugin calls before the handler runs; do not invoke
-it with `commands.execute` or bypass the host's selected-file context.
+The handler receives `{ videoInput, audioInput, format, output }`, probes the selected
+inputs with `context.media.probe`, swaps clearly reversed tracks, and awaits
+`context.media.mergeStreams`. It returns the granted output reference; the host
+validates and publishes the file. Generic and cross-plugin command calls cannot
+invoke this operation. The manifest owns the form, localized labels, entry
+points and error messages; no media-specific renderer is required.
+
+Inputs are limited to 8 GiB each and 16 GiB per operation. Snapshot and output
+staging require free disk space. Cancelling stops host-owned work before temporary
+resources are removed; closing the form keeps the job running. Host restarts
+interrupt jobs and never replay a merge automatically.

@@ -7,48 +7,219 @@
   "description": "%description%",
   "categories": ["post-action"],
   "engines": {
-    "motrix": ">=2.0.0-beta.47 <3.0.0"
+    "motrix": ">=2.0.0-beta.48 <3.0.0"
   },
   "main": "dist/plugin.js",
-  "permissions": ["ffmpeg"],
+  "permissions": ["ffmpeg", "files.selected.read", "files.selected.write"],
   "activationEvents": ["onCommand:motrix.media-merge.mergeStreams"],
   "contributes": {
     "commands": [
       {
         "id": "motrix.media-merge.mergeStreams",
         "title": "%merge%",
-        "public": true,
+        "public": false,
         "argsSchema": {
           "type": "object",
           "properties": {
             "videoInput": {
               "type": "string",
-              "minLength": 1
+              "minLength": 36,
+              "maxLength": 36
             },
             "audioInput": {
               "type": "string",
-              "minLength": 1
+              "minLength": 36,
+              "maxLength": 36
             },
             "output": {
               "type": "string",
-              "minLength": 1
+              "minLength": 36,
+              "maxLength": 36
+            },
+            "format": {
+              "type": "string",
+              "enum": ["mp4", "mkv"],
+              "default": "mp4"
             }
           },
-          "required": ["videoInput", "audioInput", "output"],
+          "required": ["videoInput", "audioInput", "output", "format"],
           "additionalProperties": false
         },
         "resultSchema": {
           "type": "object",
           "properties": {
-            "outputPath": {
-              "type": "string"
+            "output": {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36
             }
           },
-          "required": ["outputPath"],
+          "required": ["output"],
           "additionalProperties": false
-        }
+        },
+        "execution": "operation"
       }
-    ]
+    ],
+    "operations": {
+      "version": 1,
+      "items": [
+        {
+          "id": "motrix.media-merge.merge",
+          "title": "%merge%",
+          "description": "%operationDescription%",
+          "icon": "media-merge",
+          "command": "motrix.media-merge.mergeStreams",
+          "requires": [
+            "operations.v1",
+            "files.selected.v1",
+            "media.merge-streams.v1",
+            "operations.ui.v1"
+          ],
+          "fields": [
+            {
+              "field": "videoInput",
+              "label": "%videoInput%",
+              "appearance": {
+                "icon": "video",
+                "tone": "blue",
+                "placeholder": "%videoInputPlaceholder%",
+                "browseLabel": "%videoInputBrowse%",
+                "drop": true
+              },
+              "help": "%videoInputHint%"
+            },
+            {
+              "field": "audioInput",
+              "label": "%audioInput%",
+              "appearance": {
+                "icon": "audio",
+                "tone": "violet",
+                "placeholder": "%audioInputPlaceholder%",
+                "browseLabel": "%audioInputBrowse%",
+                "drop": true
+              },
+              "help": "%audioInputHint%"
+            },
+            {
+              "field": "format",
+              "label": "%format%",
+              "widget": "segmented",
+              "optionLabels": {
+                "mp4": "MP4",
+                "mkv": "MKV"
+              }
+            },
+            {
+              "field": "output",
+              "label": "%output%",
+              "appearance": {
+                "icon": "folder",
+                "tone": "amber",
+                "placeholder": "%outputPlaceholder%",
+                "browseLabel": "%outputBrowse%"
+              },
+              "help": "%outputHint%"
+            }
+          ],
+          "files": {
+            "videoInput": {
+              "kind": "input-file",
+              "use": "media"
+            },
+            "audioInput": {
+              "kind": "input-file",
+              "use": "media"
+            },
+            "output": {
+              "kind": "output-file",
+              "use": "media",
+              "extensionFrom": "format",
+              "suggestedName": {
+                "stemFrom": "videoInput",
+                "suffix": "-merged"
+              }
+            }
+          },
+          "entries": [
+            {
+              "surface": "plugin-detail"
+            },
+            {
+              "surface": "task-menu",
+              "selection": {
+                "count": {
+                  "min": 2,
+                  "max": 2
+                },
+                "every": {
+                  "status": "completed",
+                  "files": "single",
+                  "local": true
+                }
+              },
+              "bind": {
+                "videoInput": {
+                  "source": "task-file",
+                  "index": 0
+                },
+                "audioInput": {
+                  "source": "task-file",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "result": {
+            "files": ["output"]
+          },
+          "errors": {
+            "differentFiles": "%differentFiles%",
+            "missingStreams": "%missingStreams%"
+          },
+          "ui": {
+            "layout": {
+              "type": "stack",
+              "children": [
+                {
+                  "type": "grid",
+                  "columns": 2,
+                  "children": [
+                    {
+                      "type": "field",
+                      "field": "videoInput"
+                    },
+                    {
+                      "type": "field",
+                      "field": "audioInput"
+                    },
+                    {
+                      "type": "field",
+                      "field": "output",
+                      "span": 2,
+                      "accessory": "format"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "%outputNotice%",
+                  "platform": "desktop"
+                },
+                {
+                  "type": "text",
+                  "text": "%serverNotice%",
+                  "platform": "web"
+                }
+              ]
+            },
+            "submitLabel": "%mergeAction%",
+            "repeatLabel": "%mergeAgain%",
+            "footer": "%preserveOriginals%",
+            "repeat": "preserve-options"
+          }
+        }
+      ]
+    }
   },
   "l10n": "locales"
 }
