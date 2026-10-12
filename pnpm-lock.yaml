@@ -12,11 +12,11 @@ importers:
         specifier: ^2.5.4
         version: 2.5.4
       '@motrix/plugin-api':
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: ^2.2.0
+        version: 2.2.0
       '@motrix/plugin-manifest-schema':
-        specifier: ^2.1.0
-        version: 2.1.0
+        specifier: ^2.2.0
+        version: 2.2.0
       esbuild:
         specifier: ^0.24.2
         version: 0.24.2
@@ -45,8 +45,8 @@ importers:
   plugins/motrix.media-merge:
     devDependencies:
       '@motrix/plugin-api':
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: ^2.2.0
+        version: 2.2.0
       esbuild:
         specifier: ^0.24.2
         version: 0.24.2
@@ -449,8 +449,11 @@ packages:
   '@motrix/plugin-api@2.0.0':
     resolution: {integrity: sha512-S4YsMvAo9ehDN8R6jwQAzcTHBstEFH1kPw8CRePMVLSNT0pb+5jlaQdBXd1NfsxY9O4FFX4e63uuAYWlkD9Urw==}
 
-  '@motrix/plugin-manifest-schema@2.1.0':
-    resolution: {integrity: sha512-S6p1uhoQzYbepVkYV86dmmD+7xLagto7ft3vWcLK4Fg8KtvEikV1b+ZPyE5OjgpZO3WEFcMe8uuc/Iymai0fmw==}
+  '@motrix/plugin-api@2.2.0':
+    resolution: {integrity: sha512-87gTWZY3k8wAlxQxp4RQ1dZ4Egi9zMoeW1lsPFZeBd6nOsQTn/hWDyJcc3MmRYMv4ZNteb210hTzlzeHCNC7lA==}
+
+  '@motrix/plugin-manifest-schema@2.2.0':
+    resolution: {integrity: sha512-lR1D7+AHM6ElzaP5BvCgVkxL5WXmU3v/WO0GwGs2bP8+axm5PK8jnxzd+JlgGja3/b1nl+lCSksf6G9VOyVc+w==}
 
   '@rollup/rollup-android-arm-eabi@4.62.2':
     resolution: {integrity: sha512-6o7ZLZK+BeenkZCFNDXqpbjw9bD6nuWonvS/lwQJp7NoVVxm6p3qE7qQ5jGuBjiFsgvqjD8mZAU5oWxTmbOeOg==}
@@ -865,8 +868,8 @@ packages:
   yazl@2.5.1:
     resolution: {integrity: sha512-phENi2PLiHnHb6QBVot+dJnaAZ0xosj7p3fWl+znIjBDlnMI2PsZCJZ306BPTFOaHf5qdDEI8x5qFrSOBN5vrw==}
 
-  zod@4.4.3:
-    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+  zod@4.6.5:
+    resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
 
 snapshots:
 
@@ -1062,9 +1065,11 @@ snapshots:
 
   '@motrix/plugin-api@2.0.0': {}
 
-  '@motrix/plugin-manifest-schema@2.1.0':
+  '@motrix/plugin-api@2.2.0': {}
+
+  '@motrix/plugin-manifest-schema@2.2.0':
     dependencies:
-      zod: 4.4.3
+      zod: 4.6.5
 
   '@rollup/rollup-android-arm-eabi@4.62.2':
     optional: true
@@ -1458,4 +1463,4 @@ snapshots:
     dependencies:
       buffer-crc32: 0.2.13
 
-  zod@4.4.3: {}
+  zod@4.6.5: {}

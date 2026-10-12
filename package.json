@@ -17,8 +17,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.4",
-    "@motrix/plugin-api": "^2.0.0",
-    "@motrix/plugin-manifest-schema": "^2.1.0",
+    "@motrix/plugin-api": "^2.2.0",
+    "@motrix/plugin-manifest-schema": "^2.2.0",
     "esbuild": "^0.24.2",
     "vitest": "^3",
     "yauzl": "^3",

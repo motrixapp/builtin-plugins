@@ -164,8 +164,11 @@ re-encoding. Choose MP4 or MKV, keep the originals, follow progress, or cancel.
 Open its **Operations** tab, or select two completed single-file downloads.
 Configure FFmpeg in **Settings → Integration → Media Tools** first.
 
-It is **not bundled with Motrix**. The first release requires a host containing
-the manual merge interface, currently planned for `2.0.0-beta.47` or later.
+It is **not bundled with Motrix** and has not been released. It requires
+`>=2.0.0-beta.48 <3.0.0` with declarative plugin operations; beta.48 is the
+planned first supporting host release. Raise this minimum before signing if
+the host feature ships later. The published SDK 2.2.0 supplies the build-time
+API and manifest schema; installing it does not add support to an older host.
 Read the [plugin guide](plugins/motrix.media-merge/README.md) for compatibility,
 Server file selection, logs, and release prerequisites.
 
