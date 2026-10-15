@@ -9,13 +9,13 @@ inputs. Unambiguously reversed inputs are detected and swapped automatically.
 
 ## Requirements
 
-- **Motrix 2.0.0-beta.48 or later, below 3.0.0**, with plugin operations v1, composable UI, selected-file grants and the scoped media capability. Beta.48 is the planned first supporting release; this mechanism and plugin remain unpublished. If the host feature ships later, raise the package and registry minimum together before signing. Beta.47 is rejected, including development builds still reporting that version.
+- **Motrix 2.0.0-beta.48 or later, below 3.0.0**, with plugin operations v1, composable UI, selected-file grants and the scoped media capability. Beta.48 is the first released host containing these capabilities. Beta.47 is rejected, including development builds still reporting that version.
 - FFmpeg configured in **Settings → Integration → Media Tools**. Re-enable the
   plugin after changing FFmpeg configuration.
 
 ## Use
 
-After the signed release is published, install it from the [plugin directory](https://motrix.app/plugins/motrix.media-merge/) and enable it. Local archives using the `motrix.*` namespace also require a valid official signature before installation.
+Install a signed release from the [plugin directory](https://motrix.app/plugins/motrix.media-merge/) and enable it. Local archives using the `motrix.*` namespace also require a valid official signature before installation.
 Then either select two completed single-file downloads and choose **Merge audio
 and video**, or open this plugin's **Operations** tab to select local files.
 The tab embeds the same form as the task-menu dialog and retains selections
